@@ -5,7 +5,6 @@ import tempfile
 import os
 
 # Load models
-@st.cache_resource
 def load_models():
     speech_model = whisper.load_model("base")
     summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
