@@ -7,7 +7,12 @@ import os
 # Load models
 def load_models():
     speech_model = whisper.load_model("base")
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    try:
+        # For newer versions of transformers (>=4.x)
+        summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    except KeyError:
+        # Fallback for older versions
+        summarizer = pipeline("text2text-generation", model="facebook/bart-large-cnn")
     return speech_model, summarizer
 
 speech_model, summarizer = load_models()
@@ -42,7 +47,11 @@ if audio_file:
             )
 
         st.subheader("📌 Summary Notes")
-        st.write(summary[0]["summary_text"])
+        # Handle both possible output formats
+        if "summary_text" in summary[0]:
+            st.write(summary[0]["summary_text"])
+        else:
+            st.write(summary[0]["generated_text"])
 
         # Quiz Generation (simple)
         st.subheader("❓ Sample Quiz Questions")
